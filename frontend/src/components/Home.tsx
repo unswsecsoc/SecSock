@@ -1,10 +1,18 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 function Home() {
   const [token, setToken] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
+   const wsRef = useRef<WebSocket | null>(null);
 
   const createNew = async () => {
+    // Needed so replaceOld works
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
+
+    // Get new token
     const res = await fetch('http://localhost:8000/new');
     const data = await res.json();
     setToken(data.token);
@@ -20,16 +28,29 @@ Headers: ${JSON.stringify(req.headers, null, 2)}
 Body: ${req.body}`;
       setLogs((prevLogs) => [text, ...prevLogs]);
     };
+
+    wsRef.current = ws;
   };
+
+  const replaceOld = async () => {
+    setLogs([]);
+    await createNew();
+  }
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', padding: 20 }}>
       <h1>SecSock</h1>
       <button onClick={createNew}>Generate New Webhook</button>
-      {token && (
-        <p>
-          Your Webhook URL: <code>http://localhost:8000/hook/{token}</code>
-        </p>
+       {token && (
+        <>
+          <button onClick={replaceOld} style={{ marginLeft: 10 }}>
+            Reset URL
+          </button>
+          <p>
+            Your Webhook URL:{' '}
+            <code>http://localhost:8000/hook/{token}</code>
+          </p>
+        </>
       )}
       <div>
         {logs.map((log, index) => (
@@ -49,6 +70,6 @@ Body: ${req.body}`;
       </div>
     </div>
   );
-};
+}
 
 export default Home;

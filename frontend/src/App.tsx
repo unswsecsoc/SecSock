@@ -12,15 +12,11 @@ function App() {
   }, []);
 
   const handleAccept = () => {
-    Cookies.set('termsaccepted', 'true', {expires: 30});
+    Cookies.set('termsaccepted', 'true', { expires: 30 });
     setAccepted(true);
-  }
+  };
 
-  return (
-    <>
-      {termsaccepted? <Home /> : <EULA onAccept={handleAccept} />}
-    </>
-  )
+  return <>{termsaccepted ? <Home /> : <EULA onAccept={handleAccept} />}</>;
 }
 
-export default App
+export default App;
