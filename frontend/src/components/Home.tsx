@@ -3,7 +3,7 @@ import { useState, useRef } from 'react';
 function Home() {
   const [token, setToken] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
-   const wsRef = useRef<WebSocket | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   const createNew = async () => {
     // Needed so replaceOld works
@@ -35,20 +35,19 @@ Body: ${req.body}`;
   const replaceOld = async () => {
     setLogs([]);
     await createNew();
-  }
+  };
 
   return (
     <div style={{ fontFamily: 'Arial, sans-serif', padding: 20 }}>
       <h1>SecSock</h1>
       <button onClick={createNew}>Generate New Webhook</button>
-       {token && (
+      {token && (
         <>
           <button onClick={replaceOld} style={{ marginLeft: 10 }}>
             Reset URL
           </button>
           <p>
-            Your Webhook URL:{' '}
-            <code>http://localhost:8000/hook/{token}</code>
+            Your Webhook URL: <code>http://localhost:8000/hook/{token}</code>
           </p>
         </>
       )}
