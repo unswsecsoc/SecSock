@@ -33,3 +33,11 @@ npm run dev
 ```
 
 The frontend is now running at http://localhost:5173
+
+## Development tips
+Run the following commands in the frontend directory to lint and format the code respectively:
+
+```
+npm run lint
+npm run format
+```
