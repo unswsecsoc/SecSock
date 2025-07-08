@@ -1,30 +1,37 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
 import type { WebhookRequest } from './types';
+import { Bounce, ToastContainer, toast } from 'react-toastify';
 
 function Home() {
   const [token, setToken] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
 
-  // Retrieve previous session if one existed.
-  useEffect(() => {
-    const storedToken = Cookies.get('token');
-    if (storedToken) {
-      setToken(storedToken);
-      fetchLogs(storedToken);
-    }
-  }, []);
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText('http://localhost:8000/hook/' + token);
+    toast('Copied to clipboard', {
+      position: 'top-right',
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+      transition: Bounce,
+    });
+  };
 
   // Used to format a request
-  function formatRequest(req: WebhookRequest) {
+  const formatRequest = (req: WebhookRequest) => {
     const timestamp = new Date(req.timestamp * 1000).toLocaleTimeString();
-        return `${timestamp}
+    return `${timestamp}
         ${req.method} Request
           Query Parameters: ${JSON.stringify(req.query_params || {}, null, 2)}
           Headers: ${JSON.stringify(req.headers, null, 2)}
           Body: ${req.body}`;
-  }
+  };
 
   const createNew = async () => {
     // Needed so replaceOld works
@@ -50,18 +57,25 @@ function Home() {
     wsRef.current = ws;
   };
 
-  const fetchLogs = async (token: string) => {
+  const fetchLogs = useCallback(async (token: string) => {
     try {
       const res = await fetch(`http://localhost:8000/requests/${token}`);
       const data = await res.json();
-      const formatted = data.map((req: WebhookRequest) => {
-        return formatRequest(req);
-      });
-      setLogs(formatted.reverse()); // latest last → top
+      const formatted = data.map((req: WebhookRequest) => formatRequest(req));
+      setLogs(formatted.reverse());
     } catch (err) {
       console.error('Failed to load saved logs:', err);
     }
-  };
+  }, []);
+
+  // Retrieve previous session if one existed.
+  useEffect(() => {
+    const storedToken = Cookies.get('token');
+    if (storedToken) {
+      setToken(storedToken);
+      fetchLogs(storedToken);
+    }
+  }, [fetchLogs]);
 
   const replaceOld = async () => {
     setLogs([]);
@@ -80,7 +94,11 @@ function Home() {
             Reset URL
           </button>
           <p>
-            Your Webhook URL: <code>http://localhost:8000/hook/{token}</code>
+            Your Webhook URL:{' '}
+            <button onClick={copyToClipboard}>
+              http://localhost:8000/hook/{token}
+            </button>
+            <ToastContainer/>
           </p>
         </>
       )}
