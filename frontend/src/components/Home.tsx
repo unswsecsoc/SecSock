@@ -2,11 +2,36 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
 import type { WebhookRequest } from './types';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Chip,
+  Container,
+  Divider,
+  Typography,
+  useTheme,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 function Home() {
   const [token, setToken] = useState<string | null>(null);
-  const [logs, setLogs] = useState<string[]>([]);
+  const [logs, setLogs] = useState<WebhookRequest[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
+  const theme = useTheme();
+
+  const methodColorMap: Record<
+    string,
+    'info' | 'success' | 'warning' | 'error' | 'default'
+  > = {
+    GET: 'info',
+    POST: 'success',
+    PUT: 'warning',
+    DELETE: 'error',
+    PATCH: 'default',
+  };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText('http://localhost:8000/hook/' + token);
@@ -18,20 +43,20 @@ function Home() {
       pauseOnHover: false,
       draggable: true,
       progress: undefined,
-      theme: 'light',
+      theme: theme.palette.mode,
       transition: Bounce,
     });
   };
 
   // Used to format a request
-  const formatRequest = (req: WebhookRequest) => {
-    const timestamp = new Date(req.timestamp * 1000).toLocaleTimeString();
-    return `${timestamp}
-        ${req.method} Request
-          Query Parameters: ${JSON.stringify(req.query_params || {}, null, 2)}
-          Headers: ${JSON.stringify(req.headers, null, 2)}
-          Body: ${req.body}`;
-  };
+  // const formatRequest = (req: WebhookRequest) => {
+  //   const timestamp = new Date(req.timestamp * 1000).toLocaleTimeString();
+  //   return `${timestamp}
+  //       ${req.method} Request
+  //         Query Parameters: ${JSON.stringify(req.query_params || {}, null, 2)}
+  //         Headers: ${JSON.stringify(req.headers, null, 2)}
+  //         Body: ${req.body}`;
+  // };
 
   const createNew = async () => {
     // Needed so replaceOld works
@@ -46,23 +71,15 @@ function Home() {
     setToken(data.token);
     Cookies.set('token', data.token, { expires: 7 });
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/${data.token}`);
-    ws.onmessage = (event) => {
-      const req: WebhookRequest = JSON.parse(event.data);
-      const text = formatRequest(req);
-
-      setLogs((prevLogs) => [text, ...prevLogs]);
-    };
-
-    wsRef.current = ws;
+    setupWebSocket(data.token);
   };
 
   const fetchLogs = useCallback(async (token: string) => {
     try {
       const res = await fetch(`http://localhost:8000/requests/${token}`);
       const data = await res.json();
-      const formatted = data.map((req: WebhookRequest) => formatRequest(req));
-      setLogs(formatted.reverse());
+      // const formatted = data.map((req: WebhookRequest) => formatRequest(req));
+      setLogs(data.reverse());
     } catch (err) {
       console.error('Failed to load saved logs:', err);
     }
@@ -74,6 +91,7 @@ function Home() {
     if (storedToken) {
       setToken(storedToken);
       fetchLogs(storedToken);
+      setupWebSocket(storedToken);
     }
   }, [fetchLogs]);
 
@@ -82,43 +100,108 @@ function Home() {
     await createNew();
   };
 
+  const setupWebSocket = (token: string) => {
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+
+    const ws = new WebSocket(`ws://localhost:8000/ws/${token}`);
+    ws.onmessage = (event) => {
+      console.log(JSON.parse(event.data));
+      const req: WebhookRequest = JSON.parse(event.data);
+      setLogs((prevLogs) => [req, ...prevLogs]);
+    };
+    wsRef.current = ws;
+  };
+
   return (
-    <div style={{ fontFamily: 'Arial, sans-serif', padding: 20 }}>
-      <h1>SecSock</h1>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        sx={{ minHeight: '30vh', textAlign: 'center' }}
+      >
+        <Typography variant="h1" sx={{ mb: 1 }}>
+          SecSock
+        </Typography>
+        <Typography variant="h5" color="text.secondary">
+          Made with ❤ by SecSoc Projects
+        </Typography>
+      </Box>
 
-      {!token && <button onClick={createNew}>Generate New Webhook</button>}
-
-      {token && (
-        <>
-          <button onClick={replaceOld} style={{ marginLeft: 10 }}>
-            Reset URL
-          </button>
-          <p>
-            Your Webhook URL:{' '}
-            <button onClick={copyToClipboard}>
-              http://localhost:8000/hook/{token}
-            </button>
-            <ToastContainer/>
-          </p>
-        </>
-      )}
-      <div>
-        {logs.map((log, index) => (
-          <div
-            key={index}
-            style={{
-              whiteSpace: 'pre-wrap',
-              background: '#f4f4f4',
-              padding: '10px',
-              border: '1px solid #ccc',
-              marginTop: '10px',
-            }}
+      <Box display="flex" justifyContent="center" mb={4}>
+        {!token ? (
+          <Button
+            onClick={createNew}
+            variant="contained"
+            size="large"
+            sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
+            color="primary"
           >
-            {log}
-          </div>
+            Generate New Webhook
+          </Button>
+        ) : (
+          <Box textAlign="center">
+            <Button
+              onClick={replaceOld}
+              variant="contained"
+              size="large"
+              sx={{ fontSize: '1.1rem', px: 3, py: 1.5, mb: 2 }}
+              color="secondary"
+            >
+              Reset URL
+            </Button>
+
+            <Typography variant="h6">
+              Your Webhook URL:{' '}
+              <Button onClick={copyToClipboard} variant="text">
+                http://localhost:8000/hook/{token}
+              </Button>
+            </Typography>
+          </Box>
+        )}
+      </Box>
+
+      <Box>
+        {logs.map((req, index) => (
+          <Accordion key={index} sx={{ mb: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Box sx={{ width: '100%' }}>
+                <Box display="flex" justifyContent="space-between">
+                  <Box display={'flex'} alignItems={'center'} gap={1}>
+                    <Chip
+                      label={req.method}
+                      color={methodColorMap[req.method] || 'default'}
+                      size="small"
+                    />
+                    <Typography variant="body2">{req.ip}</Typography>
+                  </Box>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 0.2 }}
+                  >
+                    {new Date(req.timestamp * 1000).toLocaleString()}
+                  </Typography>
+                </Box>
+              </Box>
+            </AccordionSummary>
+
+            <AccordionDetails>
+              <Divider sx={{ mb: 1 }}>Query Parameters</Divider>
+              <pre>{JSON.stringify(req.query_params || {}, null, 2)}</pre>
+              <Divider sx={{ my: 1 }}>Headers</Divider>
+              <pre>{JSON.stringify(req.headers || {}, null, 2)}</pre>
+              <Divider sx={{ my: 1 }}>Body</Divider>
+              <pre>{req.body}</pre>
+            </AccordionDetails>
+          </Accordion>
         ))}
-      </div>
-    </div>
+      </Box>
+
+      <ToastContainer />
+    </Container>
   );
 }
 

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uuid
 import time
@@ -55,8 +55,8 @@ def new_webhook():
 async def catch_all(token: str, request: Request):
     if token not in webhooks:
         return JSONResponse(status_code=404, content={"error": "Token not found"})
-
     req_data = {
+        "ip": request.client.host, # type: ignore
         "method": request.method,
         "headers": dict(request.headers),
         "body": (await request.body()).decode("utf-8", errors="ignore"),
