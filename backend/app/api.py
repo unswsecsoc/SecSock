@@ -92,3 +92,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
             await websocket.receive_text()  # keep connection alive
     except WebSocketDisconnect:
         clients[token].remove(websocket)
+        
+@app.get("/robots.txt")
+def robots():
+    return "this isn't a ctf lol"
