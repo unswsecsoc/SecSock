@@ -9,7 +9,6 @@ import {
   Box,
   Button,
   Chip,
-  Container,
   Divider,
   Typography,
   useTheme,
@@ -115,12 +114,12 @@ function Home() {
   };
 
   return (
-    <Container maxWidth={false} disableGutters sx={{ py: 4 }}>
+    <Box sx={{ py: 4, width: '100vw' }}>
       <Box
         display="flex"
         flexDirection="column"
         alignItems="center"
-        sx={{ minHeight: '20vh', textAlign: 'center' }}
+        sx={{ minHeight: '20vh', textAlign: 'center'}}
       >
         <Typography variant="h1" sx={{ mb: 1 }}>
           SecSock
@@ -135,15 +134,13 @@ function Home() {
         width={'100%'}
         alignItems={'flex-start'}
         gap={5}
-        sx={{ border: '2px solid red' }}
       >
         <Box
           sx={{
-            flex: '0 0 500px',
+            flex: '0 0 30%',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'flex-start',
-            border: '2px solid red',
           }}
         >
           {!token ? (
@@ -188,9 +185,9 @@ function Home() {
 
         <Box
           sx={{
-            flex: '1 1 auto',
+            flex: '1 1 70%',
             overflow: 'auto',
-            border: '2px solid red',
+            mr: 10
           }}
         >
           {logs.map((req, index) => (
@@ -348,7 +345,7 @@ function Home() {
       </Box>
 
       <ToastContainer />
-    </Container>
+    </Box>
   );
 }
 
