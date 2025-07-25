@@ -115,12 +115,12 @@ function Home() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth={false} disableGutters sx={{ py: 4 }}>
       <Box
         display="flex"
         flexDirection="column"
         alignItems="center"
-        sx={{ minHeight: '30vh', textAlign: 'center' }}
+        sx={{ minHeight: '20vh', textAlign: 'center' }}
       >
         <Typography variant="h1" sx={{ mb: 1 }}>
           SecSock
@@ -130,142 +130,221 @@ function Home() {
         </Typography>
       </Box>
 
-      <Box display="flex" justifyContent="center" mb={4}>
-        {!token ? (
-          <Button
-            onClick={createNew}
-            variant="contained"
-            size="large"
-            sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
-            color="primary"
-          >
-            Generate New Webhook
-          </Button>
-        ) : (
-          <Box textAlign="center">
+      <Box
+        display={'flex'}
+        width={'100%'}
+        alignItems={'flex-start'}
+        gap={5}
+        sx={{ border: '2px solid red' }}
+      >
+        <Box
+          sx={{
+            flex: '0 0 500px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            border: '2px solid red',
+          }}
+        >
+          {!token ? (
             <Button
-              onClick={replaceOld}
+              onClick={createNew}
               variant="contained"
               size="large"
-              sx={{ fontSize: '1.1rem', px: 3, py: 1.5, mb: 2 }}
-              color="secondary"
+              sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
+              color="primary"
             >
-              Reset URL
+              Generate New Webhook
             </Button>
-
-            <Typography variant="h6">
-              Your Webhook URL:{' '}
-              <Button onClick={copyToClipboard} variant="text">
-                http://localhost:8000/hook/{token}
+          ) : (
+            <Box
+              textAlign="center"
+              bgcolor={'background.paper'}
+              borderRadius={2}
+              padding={2}
+            >
+              <Typography variant="h5">
+                Your webhook link:{' '}
+                <Button
+                  onClick={copyToClipboard}
+                  variant="text"
+                  sx={{ my: 1, fontSize: '1rem' }}
+                >
+                  http://localhost:8000/hook/{token}
+                </Button>
+              </Typography>
+              <Button
+                onClick={replaceOld}
+                variant="outlined"
+                size="small"
+                sx={{ fontSize: '1.1rem', px: 1, py: 0.5, mb: 2 }}
+                color="secondary"
+              >
+                Reset URL
               </Button>
-            </Typography>
-          </Box>
-        )}
-      </Box>
+            </Box>
+          )}
+        </Box>
 
-      <Box>
-        {logs.map((req, index) => (
-          <Accordion key={index} sx={{ mb: 2 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Box sx={{ width: '100%' }}>
-                <Box display="flex" justifyContent="space-between">
-                  <Box display={'flex'} alignItems={'center'} gap={1}>
-                    <Chip
-                      label={req.method}
-                      color={methodColorMap[req.method] || 'default'}
-                      size="small"
-                    />
-                    <Typography variant="body2">{req.ip}</Typography>
+        <Box
+          sx={{
+            flex: '1 1 auto',
+            overflow: 'auto',
+            border: '2px solid red',
+          }}
+        >
+          {logs.map((req, index) => (
+            <Accordion key={index} sx={{ mb: 2 }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Box sx={{ width: '100%' }}>
+                  <Box display="flex" justifyContent="space-between">
+                    <Box display={'flex'} alignItems={'center'} gap={1}>
+                      <Chip
+                        label={req.method}
+                        color={methodColorMap[req.method] || 'default'}
+                        size="small"
+                      />
+                      <Typography variant="body1">{req.ip}</Typography>
+                    </Box>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{ mt: 0.2 }}
+                    >
+                      {new Date(req.timestamp * 1000).toLocaleString()}
+                    </Typography>
                   </Box>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ mt: 0.2 }}
-                  >
-                    {new Date(req.timestamp * 1000).toLocaleString()}
+                </Box>
+              </AccordionSummary>
+
+              <AccordionDetails sx={{ px: 2, py: 1 }}>
+                {/* Query section */}
+                <Divider sx={{ mb: 1 }}>Query Parameters</Divider>
+                {req.query_params &&
+                Object.keys(req.query_params).length > 0 ? (
+                  <Box component="dl" sx={{ ml: 1 }}>
+                    {Object.entries(req.query_params).map(([key, value]) => (
+                      <Box key={key} sx={{ display: 'flex', mb: 0.5 }}>
+                        <Typography
+                          fontSize={18}
+                          sx={{
+                            minWidth: 100,
+                            fontWeight: 'bold',
+                            textAlign: 'left',
+                            mr: '1',
+                          }}
+                        >
+                          {key}:
+                        </Typography>
+                        <Typography
+                          sx={{
+                            wordBreak: 'break-word',
+                            color: 'text.secondary',
+                            ml: 1,
+                          }}
+                        >
+                          {String(value)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography sx={{ ml: 1, fontStyle: 'italic' }}>
+                    {'{}'}
                   </Typography>
-                </Box>
-              </Box>
-            </AccordionSummary>
+                )}
 
-            <AccordionDetails sx={{ px: 2, py: 1 }}>
-              {/* Query section */}
-              <Divider sx={{ mb: 1 }}>Query Parameters</Divider>
-              {req.query_params && Object.keys(req.query_params).length > 0 ? (
-                <Box component="dl" sx={{ ml: 1 }}>
-                  {Object.entries(req.query_params).map(([key, value]) => (
-                    <Box key={key} sx={{ display: 'flex', mb: 0.5}}>
-                      <Typography sx={{ minWidth: 100, fontWeight: 'bold', textAlign: 'left', mr: '1' }}>
-                        {key}:
-                      </Typography>
-                      <Typography sx={{ wordBreak: 'break-word' }}>
-                        {String(value)}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              ) : (
-                <Typography sx={{ ml: 1, fontStyle: 'italic' }}>
-                  {'{}'}
-                </Typography>
-              )}
+                {/* Header section */}
+                <Divider sx={{ my: 1 }}>Headers</Divider>
+                {req.headers && Object.keys(req.headers).length > 0 ? (
+                  <Box component="dl" sx={{ ml: 1 }}>
+                    {Object.entries(req.headers).map(([key, value]) => (
+                      <Box
+                        key={key}
+                        sx={{
+                          display: 'flex',
+                          mb: 0.5,
+                          textAlign: 'left',
+                          mr: '1',
+                        }}
+                      >
+                        <Typography
+                          fontSize={17}
+                          sx={{ minWidth: 100, fontWeight: 'bold' }}
+                        >
+                          {key}:
+                        </Typography>
+                        <Typography
+                          sx={{
+                            wordBreak: 'break-word',
+                            color: 'text.secondary',
+                            ml: 1,
+                          }}
+                        >
+                          {String(value)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography sx={{ ml: 1, fontStyle: 'italic' }}>
+                    {'{}'}
+                  </Typography>
+                )}
 
-              {/* Header section */}
-              <Divider sx={{ my: 1 }}>Headers</Divider>
-              {req.headers && Object.keys(req.headers).length > 0 ? (
-                <Box component="dl" sx={{ ml: 1 }}>
-                  {Object.entries(req.headers).map(([key, value]) => (
-                    <Box key={key} sx={{ display: 'flex', mb: 0.5, textAlign: 'left', mr: '1'  }}>
-                      <Typography sx={{ minWidth: 100, fontWeight: 'bold' }}>
-                        {key}:
-                      </Typography>
-                      <Typography sx={{ wordBreak: 'break-word' }}>
-                        {String(value)}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              ) : (
-                <Typography sx={{ ml: 1, fontStyle: 'italic' }}>
-                  {'{}'}
-                </Typography>
-              )}
-
-              {/* Body section */}
-              <Divider sx={{ my: 1 }}>Body</Divider>
-              {req.body && req.body !== '{}' ? (
-                <Box component="dl" sx={{ ml: 1 }}>
-                  {(() => {
-                    try {
-                      const bodyObj =
-                        typeof req.body === 'string'
-                          ? JSON.parse(req.body)
-                          : req.body;
-                      return Object.entries(bodyObj).map(([key, value]) => (
-                        <Box key={key} sx={{ display: 'flex', mb: 0.5, textAlign: 'left', mr: '1'  }}>
-                          <Typography
-                            sx={{ minWidth: 100, fontWeight: 'bold' }}
+                {/* Body section */}
+                <Divider sx={{ my: 1 }}>Body</Divider>
+                {req.body && req.body !== '{}' ? (
+                  <Box component="dl" sx={{ ml: 1 }}>
+                    {(() => {
+                      try {
+                        const bodyObj =
+                          typeof req.body === 'string'
+                            ? JSON.parse(req.body)
+                            : req.body;
+                        return Object.entries(bodyObj).map(([key, value]) => (
+                          <Box
+                            key={key}
+                            sx={{
+                              display: 'flex',
+                              mb: 0.5,
+                              textAlign: 'left',
+                              mr: '1',
+                            }}
                           >
-                            {key}:
-                          </Typography>
-                          <Typography sx={{ wordBreak: 'break-word' }}>
-                            {String(value)}
-                          </Typography>
-                        </Box>
-                      ));
-                    } catch {
-                      return <Typography sx={{ ml: 1 }}>{req.body}</Typography>;
-                    }
-                  })()}
-                </Box>
-              ) : (
-                <Typography sx={{ ml: 1, fontStyle: 'italic' }}>
-                  {'{}'}
-                </Typography>
-              )}
-            </AccordionDetails>
-          </Accordion>
-        ))}
+                            <Typography
+                              fontSize={17}
+                              sx={{ minWidth: 100, fontWeight: 'bold' }}
+                            >
+                              {key}:
+                            </Typography>
+                            <Typography
+                              sx={{
+                                wordBreak: 'break-word',
+                                color: 'text.secondary',
+                                ml: 1,
+                              }}
+                            >
+                              {String(value)}
+                            </Typography>
+                          </Box>
+                        ));
+                      } catch {
+                        return (
+                          <Typography sx={{ ml: 1 }}>{req.body}</Typography>
+                        );
+                      }
+                    })()}
+                  </Box>
+                ) : (
+                  <Typography sx={{ ml: 1, fontStyle: 'italic' }}>
+                    {'{}'}
+                  </Typography>
+                )}
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Box>
       </Box>
 
       <ToastContainer />
