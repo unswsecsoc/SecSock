@@ -5,6 +5,8 @@ import { Bounce, ToastContainer, toast } from 'react-toastify';
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import RequestAccordion from './RequestAccordion';
 import PulsingDot from './PulsingDot';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 function Home() {
   const [token, setToken] = useState<string | null>(null);
@@ -13,11 +15,11 @@ function Home() {
   const theme = useTheme();
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-const playSound = () => {
+  const playSound = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch((e) => {
-        console.warn("Audio play failed:", e);
+        console.warn('Audio play failed:', e);
       });
     }
   };
@@ -95,7 +97,9 @@ const playSound = () => {
 
   // Retrieve previous session if one existed.
   useEffect(() => {
-    audioRef.current = new Audio('/src/assets/request_received_notification.mp3');
+    audioRef.current = new Audio(
+      '/src/assets/request_received_notification.mp3'
+    );
     audioRef.current.load();
 
     const storedToken = Cookies.get('token');
@@ -107,107 +111,116 @@ const playSound = () => {
   }, [fetchLogs, setupWebSocket]);
 
   return (
-    <Box sx={{ py: 4, width: '100vw' }}>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        sx={{ minHeight: '20vh', textAlign: 'center' }}
-      >
-        <Typography variant="h1" sx={{ mb: 1 }}>
-          SecSock
-        </Typography>
-        <Typography variant="h5" color="text.secondary">
-          Made with ❤ by SecSoc Projects
-        </Typography>
-      </Box>
-
-      {/* If not token has been previously generated */}
-      {!token && (
-        <Button
-          onClick={createNew}
-          variant="contained"
-          size="large"
-          sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
-          color="primary"
+    <>
+      <Navbar />
+      <Box sx={{ py: 4, width: '100vw' }}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          sx={{ minHeight: '20vh', textAlign: 'center' }}
         >
-          Generate New Webhook
-        </Button>
-      )}
+          <Typography variant="h1" sx={{ mb: 1, mt: 5 }}>
+            SecSock
+          </Typography>
+          <Typography variant="h5" color="text.secondary">
+            Made with ❤ by SecSoc Projects
+          </Typography>
+        </Box>
 
-      {/* If a token is already stored */}
-      {token && (
-        <Box display={'flex'} width={'100%'} alignItems={'flex-start'} gap={5}>
+        {/* If not token has been previously generated */}
+        {!token && (
+          <Button
+            onClick={createNew}
+            variant="contained"
+            size="large"
+            sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
+            color="primary"
+          >
+            Generate New Webhook
+          </Button>
+        )}
+
+        {/* If a token is already stored */}
+        {token && (
           <Box
-            sx={{
-              flex: '0 0 30%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'flex-start',
-            }}
+            display={'flex'}
+            width={'100%'}
+            alignItems={'flex-start'}
+            gap={5}
           >
             <Box
-              textAlign="center"
-              bgcolor={'background.paper'}
-              borderRadius={2}
-              padding={2}
-            >
-              <Typography variant="h5">
-                Your webhook link:{' '}
-                <Button
-                  onClick={copyToClipboard}
-                  variant="text"
-                  sx={{ my: 1, fontSize: '1rem' }}
-                >
-                  http://localhost:8000/hook/{token}
-                </Button>
-              </Typography>
-              <Button
-                onClick={replaceOld}
-                variant="outlined"
-                size="small"
-                sx={{ fontSize: '1.1rem', px: 1, py: 0.5, mb: 2 }}
-                color="secondary"
-              >
-                Reset URL
-              </Button>
-            </Box>
-          </Box>
-
-          {/* Accordion */}
-          <Box
-            sx={{
-              flex: '1 1 70%',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1,
-              mr: 10,
-            }}
-          >
-            <Box display="flex" alignItems="center" gap={2} ml={1}>
-              <PulsingDot />
-              <Typography variant="h5" fontWeight={600}>
-                Listening...
-              </Typography>
-            </Box>
-
-            <Box
-              bgcolor={'background.paper'}
-              padding={2}
-              borderRadius={2}
               sx={{
-                overflow: 'auto',
-                minHeight: '50vh',
-                flexGrow: 1,
+                flex: '0 0 30%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
               }}
             >
-              <RequestAccordion logs={logs} />
+              <Box
+                textAlign="center"
+                bgcolor={'background.paper'}
+                borderRadius={2}
+                padding={2}
+              >
+                <Typography variant="h5">
+                  Your webhook link:{' '}
+                  <Button
+                    onClick={copyToClipboard}
+                    variant="text"
+                    sx={{ my: 1, fontSize: '1rem' }}
+                  >
+                    http://localhost:8000/hook/{token}
+                  </Button>
+                </Typography>
+                <Button
+                  onClick={replaceOld}
+                  variant="outlined"
+                  size="small"
+                  sx={{ fontSize: '1.1rem', px: 1, py: 0.5, mb: 2 }}
+                  color="secondary"
+                >
+                  Reset URL
+                </Button>
+              </Box>
+            </Box>
+
+            {/* Accordion */}
+            <Box
+              sx={{
+                flex: '1 1 70%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                mr: 10,
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={2} ml={1}>
+                <PulsingDot />
+                <Typography variant="h5" fontWeight={600}>
+                  Listening...
+                </Typography>
+              </Box>
+
+              <Box
+                bgcolor={'background.paper'}
+                padding={2}
+                borderRadius={2}
+                sx={{
+                  overflow: 'auto',
+                  minHeight: '50vh',
+                  flexGrow: 1,
+                }}
+              >
+                <RequestAccordion logs={logs} />
+              </Box>
             </Box>
           </Box>
-        </Box>
-      )}
-      <ToastContainer />
-    </Box>
+        )}
+        <ToastContainer />
+      </Box>
+      <Footer />
+    </>
   );
 }
 
