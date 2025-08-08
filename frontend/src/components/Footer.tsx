@@ -16,7 +16,7 @@ export default function Footer() {
       }}
     >
       <Typography variant="body1" color="text.secondary">
-        © {new Date().getFullYear()} UNSW Security Society &nbsp;|&nbsp;
+        © {new Date().getFullYear()} The Security Society of UNSW &nbsp;|&nbsp;
         Made with ❤ by SecSoc Projects
       </Typography>
     </Box>

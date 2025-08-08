@@ -113,29 +113,21 @@ function Home() {
   return (
     <>
       <Navbar />
-      <Box sx={{ py: 4, width: '100vw', minHeight: '94.6vh'}}  >
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          sx={{ minHeight: '20vh', textAlign: 'center' }}
-        >
-          <Typography variant="h1" sx={{ mb: 1, mt: 5 }}>
-            SecSock
-          </Typography>
-        </Box>
+      <Box sx={{ py: 4, width: '100vw', minHeight: '94.6vh', mt: '10vh'}}  >
 
         {/* If not token has been previously generated */}
         {!token && (
-          <Button
-            onClick={createNew}
-            variant="contained"
-            size="large"
-            sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
-            color="primary"
-          >
-            Generate New Webhook
-          </Button>
+          <Box m={'11%'}>
+            <Button
+              onClick={createNew}
+              variant="contained"
+              size="large"
+              sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
+              color="primary"
+            >
+              Generate New Webhook
+            </Button>
+          </Box>
         )}
 
         {/* If a token is already stored */}
@@ -144,11 +136,11 @@ function Home() {
             display={'flex'}
             width={'100%'}
             alignItems={'flex-start'}
-            gap={5}
+            gap={2}
           >
             <Box
               sx={{
-                flex: '0 0 30%',
+                flex: '0 0 40%',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'flex-start',
@@ -185,7 +177,7 @@ function Home() {
             {/* Accordion */}
             <Box
               sx={{
-                flex: '1 1 70%',
+                flex: '1 1 60%',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 1,
