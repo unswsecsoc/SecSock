@@ -1,4 +1,4 @@
-import { Box, Typography, Link } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 export default function Footer() {
   return (
@@ -15,15 +15,9 @@ export default function Footer() {
         textAlign: 'center',
       }}
     >
-      <Typography variant="body2" color="text.secondary">
-        © {new Date().getFullYear()} SecSock &nbsp;|&nbsp;
-        <Link href="https://github.com/unswsecsoc/SecSock" underline="hover" target="_blank" rel="noopener">
-          GitHub
-        </Link>
-        &nbsp;|&nbsp;
-        <Link href="/privacy" underline="hover">
-          Privacy
-        </Link>
+      <Typography variant="body1" color="text.secondary">
+        © {new Date().getFullYear()} UNSW Security Society &nbsp;|&nbsp;
+        Made with ❤ by SecSoc Projects
       </Typography>
     </Box>
   );

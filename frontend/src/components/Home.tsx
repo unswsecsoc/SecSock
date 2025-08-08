@@ -113,7 +113,7 @@ function Home() {
   return (
     <>
       <Navbar />
-      <Box sx={{ py: 4, width: '100vw' }}>
+      <Box sx={{ py: 4, width: '100vw', minHeight: '94.6vh'}}  >
         <Box
           display="flex"
           flexDirection="column"
@@ -122,9 +122,6 @@ function Home() {
         >
           <Typography variant="h1" sx={{ mb: 1, mt: 5 }}>
             SecSock
-          </Typography>
-          <Typography variant="h5" color="text.secondary">
-            Made with ❤ by SecSoc Projects
           </Typography>
         </Box>
 
