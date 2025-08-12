@@ -41,3 +41,11 @@ Run the following commands in the frontend directory to lint and format the code
 npm run lint
 npm run format
 ```
+
+## Deployment
+First, push your changes, then run: 
+
+```
+npm run deploy
+```
+This will deploy the frontend on github pages.
