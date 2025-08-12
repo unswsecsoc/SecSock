@@ -49,7 +49,7 @@ function Home() {
     }
 
     // Get new token
-    const res = await fetch('http://{backendURL}/new');
+    const res = await fetch('http://${backendURL}/new');
     const data = await res.json();
     setToken(data.token);
     Cookies.set('token', data.token, { expires: 7 });
@@ -59,7 +59,7 @@ function Home() {
 
   const fetchLogs = useCallback(async (token: string) => {
     try {
-      const res = await fetch(`http://{backendURL}/requests/${token}`);
+      const res = await fetch(`http://${backendURL}/requests/${token}`);
       const data = await res.json();
       setLogs(data.reverse());
     } catch (err) {
