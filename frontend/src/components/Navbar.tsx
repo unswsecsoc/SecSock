@@ -2,7 +2,6 @@ import React from 'react';
 import {
   AppBar,
   Box,
-  Button,
   Slide,
   Toolbar,
   Typography,
@@ -32,12 +31,12 @@ const HideOnScrollAppBar = () => {
 
           {/* Right Side: Buttons */}
           <Box sx={{ display: 'flex' }}>
-            <Button color="inherit" onClick={() => alert('Docs clicked')}>
+            {/* <Button color="inherit" onClick={() => alert('Docs clicked')}>
               Docs
             </Button>
             <Button color="inherit" onClick={() => alert('Login clicked')}>
               Login
-            </Button>
+            </Button> */}
           </Box>
         </Toolbar>
       </AppBar>
