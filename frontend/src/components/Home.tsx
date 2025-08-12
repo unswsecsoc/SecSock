@@ -113,8 +113,7 @@ function Home() {
   return (
     <>
       <Navbar />
-      <Box sx={{ py: 4, width: '100vw', minHeight: '94.6vh', mt: '10vh'}}  >
-
+      <Box sx={{ py: 4, width: '100vw', minHeight: '94.6vh', mt: '10vh' }}>
         {/* If not token has been previously generated */}
         {!token && (
           <Box m={'11%'}>
