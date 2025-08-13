@@ -13,7 +13,8 @@ clients = {}   # {token: [list of WebSocket connections]}
 origins = [
     "http://localhost:5173",
     "localhost:5173",
-    "https://unswsecsoc.github.io/SecSock/"
+    "https://unswsecsoc.github.io/SecSock/",
+    "unswsecsoc.github.io"
 ]
 
 app.add_middleware(
