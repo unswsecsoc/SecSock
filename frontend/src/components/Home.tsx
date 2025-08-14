@@ -8,7 +8,7 @@ import PulsingDot from './PulsingDot';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-const backendURL = "2b86c3c2d262.ngrok-free.app"
+const backendURL = "api.secsock.secso.cc"
 
 function Home() {
   const [token, setToken] = useState<string | null>(null);

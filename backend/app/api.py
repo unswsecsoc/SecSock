@@ -14,7 +14,8 @@ origins = [
     "http://localhost:5173",
     "localhost:5173",
     "https://unswsecsoc.github.io/SecSock/",
-    "unswsecsoc.github.io"
+    "unswsecsoc.github.io",
+    "https://api.secsock.secso.cc/"
 ]
 
 app.add_middleware(
@@ -39,7 +40,7 @@ async def root():
         </head>
         <body>
             <h1>SecSock</h1>
-            <h2>Welcome to the SecSock api</h2>
+            <h2>Welcome to the SecSock API</h2>
         </body>
     </html>
     """)
