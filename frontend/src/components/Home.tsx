@@ -7,6 +7,7 @@ import RequestAccordion from './RequestAccordion';
 import PulsingDot from './PulsingDot';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import notificationSound from '../assets/request_received_notification.mp3';
 
 const backendURL = "api.secsock.secso.cc"
 
@@ -78,7 +79,7 @@ function Home() {
         wsRef.current.close();
       }
 
-      const ws = new WebSocket(`ws://${backendURL}/ws/${token}`);
+      const ws = new WebSocket(`wss://${backendURL}/ws/${token}`);
       ws.onmessage = (event) => {
         toast('Received a request', {
           position: 'top-right',
@@ -99,9 +100,7 @@ function Home() {
 
   // Retrieve previous session if one existed.
   useEffect(() => {
-    audioRef.current = new Audio(
-      '/src/assets/request_received_notification.mp3'
-    );
+    audioRef.current = new Audio(notificationSound);
     audioRef.current.load();
 
     const storedToken = Cookies.get('token');
