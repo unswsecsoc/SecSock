@@ -79,7 +79,7 @@ function Home() {
         wsRef.current.close();
       }
 
-      const ws = new WebSocket(`ws://${backendURL}/ws/${token}`);
+      const ws = new WebSocket(`wss://${backendURL}/ws/${token}`);
       ws.onmessage = (event) => {
         toast('Received a request', {
           position: 'top-right',
