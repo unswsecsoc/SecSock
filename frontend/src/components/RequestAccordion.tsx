@@ -5,10 +5,20 @@ import {
   Box,
   Chip,
   Divider,
+  IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DeleteIcon from '@mui/icons-material/Delete';
 import type { WebhookRequest } from './types';
+import { useState } from 'react';
+
+type RequestAccordionProps = {
+  logs: WebhookRequest[];
+  setLogs: React.Dispatch<React.SetStateAction<WebhookRequest[]>>;
+  token: string | null;
+};
 
 const methodColorMap: Record<
   string,
@@ -21,11 +31,47 @@ const methodColorMap: Record<
   PATCH: 'default',
 };
 
-export default function RequestAccordion({ logs }: { logs: WebhookRequest[] }) {
+export default function RequestAccordion({
+  logs,
+  setLogs,
+  token,
+}: RequestAccordionProps) {
+  const [expanded, setExpanded] = useState<string | false>(false);
+  // Track whether accordion is opened or not
+  // Used to fix issue where deleting an accordion, would uncollapse the next one automatically
+  const handleChange =
+    (id: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpanded(isExpanded ? id : false);
+    };
+
+  async function handleDelete(id: string) {
+    const backendURL = import.meta.env.VITE_BACKEND_URL;
+    try {
+      const res = await fetch(`${backendURL}/requests/${token}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        // Remove the request client-side and assume it was deleted in the backend since 200 was returned
+        setLogs((prev) => prev.filter((req) => req.id !== id));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <>
-      {logs.map((req, index) => (
-        <Accordion key={index} sx={{ mb: 2 }}>
+      {logs.map((req) => (
+        <Accordion
+          key={req.id}
+          expanded={expanded === req.id}
+          onChange={handleChange(req.id)}
+          sx={{ mb: 2 }}
+        >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Box sx={{ width: '100%' }}>
               <Box display="flex" justifyContent="space-between">
@@ -44,6 +90,11 @@ export default function RequestAccordion({ logs }: { logs: WebhookRequest[] }) {
                 >
                   {new Date(req.timestamp * 1000).toLocaleString()}
                 </Typography>
+                <Tooltip title="Delete request">
+                  <IconButton size="small" onClick={() => handleDelete(req.id)}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </Box>
             </Box>
           </AccordionSummary>

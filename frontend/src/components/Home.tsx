@@ -10,9 +10,7 @@ import Footer from './Footer';
 import notificationSound from '../assets/request_received_notification.mp3';
 
 const backendURL = import.meta.env.VITE_BACKEND_URL;
-const backendDomain = backendURL.split("//")[1];
-console.log(backendDomain);
-// const backendURL = "api.secsock.secso.cc"
+const backendDomain = backendURL.split('//')[1];
 
 function Home() {
   const [token, setToken] = useState<string | null>(null);
@@ -42,6 +40,7 @@ function Home() {
       progress: undefined,
       theme: theme.palette.mode,
       transition: Bounce,
+      pauseOnFocusLoss: false,
     });
   };
 
@@ -90,6 +89,7 @@ function Home() {
           autoClose: 3000,
           theme: theme.palette.mode,
           transition: Bounce,
+          pauseOnFocusLoss: false,
         });
 
         playSound();
@@ -205,7 +205,7 @@ function Home() {
                   flexGrow: 1,
                 }}
               >
-                <RequestAccordion logs={logs} />
+                <RequestAccordion logs={logs} token={token} setLogs={setLogs} />
               </Box>
             </Box>
           </Box>
