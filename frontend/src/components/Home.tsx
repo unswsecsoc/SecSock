@@ -9,7 +9,8 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import notificationSound from '../assets/request_received_notification.mp3';
 
-const backendURL = "api.secsock.secso.cc"
+const backendURL = import.meta.env.VITE_BACKEND_URL;
+const backendDomain = backendURL.split('//')[1];
 
 function Home() {
   const [token, setToken] = useState<string | null>(null);
@@ -28,7 +29,7 @@ function Home() {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText('https://' + backendURL + '/hook/' + token);
+    navigator.clipboard.writeText(backendURL + '/hook/' + token);
     toast('Copied to clipboard', {
       position: 'top-right',
       autoClose: 3000,
@@ -39,6 +40,7 @@ function Home() {
       progress: undefined,
       theme: theme.palette.mode,
       transition: Bounce,
+      pauseOnFocusLoss: false,
     });
   };
 
@@ -50,7 +52,7 @@ function Home() {
     }
 
     // Get new token
-    const res = await fetch(`https://${backendURL}/new`);
+    const res = await fetch(`${backendURL}/new`);
     const data = await res.json();
     setToken(data.token);
     Cookies.set('token', data.token, { expires: 7 });
@@ -60,7 +62,7 @@ function Home() {
 
   const fetchLogs = useCallback(async (token: string) => {
     try {
-      const res = await fetch(`https://${backendURL}/requests/${token}`);
+      const res = await fetch(`${backendURL}/requests/${token}`);
       const data = await res.json();
       setLogs(data.reverse());
     } catch (err) {
@@ -79,13 +81,15 @@ function Home() {
         wsRef.current.close();
       }
 
-      const ws = new WebSocket(`wss://${backendURL}/ws/${token}`);
+      // Need a way to make this wss automatically for prod, wss doesn't work in dev environment
+      const ws = new WebSocket(`ws://${backendDomain}/ws/${token}`);
       ws.onmessage = (event) => {
         toast('Received a request', {
           position: 'top-right',
           autoClose: 3000,
           theme: theme.palette.mode,
           transition: Bounce,
+          pauseOnFocusLoss: false,
         });
 
         playSound();
@@ -159,7 +163,7 @@ function Home() {
                     variant="text"
                     sx={{ my: 1, fontSize: '1rem' }}
                   >
-                    https://{backendURL}/hook/{token}
+                    {backendURL}/hook/{token}
                   </Button>
                 </Typography>
                 <Button
@@ -201,7 +205,7 @@ function Home() {
                   flexGrow: 1,
                 }}
               >
-                <RequestAccordion logs={logs} />
+                <RequestAccordion logs={logs} token={token} setLogs={setLogs} />
               </Box>
             </Box>
           </Box>

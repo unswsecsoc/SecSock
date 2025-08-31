@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import uuid
 import time
 
@@ -13,6 +14,7 @@ clients = {}   # {token: [list of WebSocket connections]}
 origins = [
     "http://localhost:5173",
     "localhost:5173",
+    "http://localhost:8080",
     "https://unswsecsoc.github.io/SecSock/",
     "unswsecsoc.github.io",
     "https://api.secsock.secso.cc/"
@@ -20,7 +22,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,6 +51,8 @@ async def root():
 @app.get("/new")
 def new_webhook():
     token = uuid.uuid4().hex[:8]  # short UUID
+    while (token in webhooks):
+        token = uuid.uuid4().hex[:8]
     webhooks[token] = []
     clients[token] = []
     return {"url": f"/hook/{token}", "token": token}
@@ -58,7 +62,9 @@ def new_webhook():
 async def catch_all(token: str, request: Request):
     if token not in webhooks:
         return JSONResponse(status_code=404, content={"error": "Token not found"})
+    request_id = uuid.uuid1().hex[:8] # time based UUID
     req_data = {
+        "id": request_id, # Unique identifier for this request
         "ip": request.client.host, # type: ignore
         "method": request.method,
         "headers": dict(request.headers),
@@ -82,6 +88,24 @@ async def catch_all(token: str, request: Request):
 def get_requests(token: str):
     return webhooks.get(token, [])
 
+class RequestID(BaseModel):
+    id: str
+
+@app.delete("/requests/{token}/delete")
+def delete_request(token: str, request: RequestID):
+    request_id = request.id;
+    if token not in webhooks:
+        return JSONResponse(status_code=404, content={"error": "Token not found"})
+    found = False
+    for req in webhooks[token]:
+        if req['id'] == request_id:
+            webhooks[token].remove(req)
+            found = True
+            break;
+    if not found:
+        return JSONResponse(status_code=404, content={"error": "Request not found"})
+    return {"status": "deleted"}
+    
 @app.websocket("/ws/{token}")
 async def websocket_endpoint(websocket: WebSocket, token: str):
     if token not in clients:
@@ -95,7 +119,4 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
             await websocket.receive_text()  # keep connection alive
     except WebSocketDisconnect:
         clients[token].remove(websocket)
-        
-@app.get("/robots.txt")
-def robots():
-    return "this isn't a ctf lol"
+
