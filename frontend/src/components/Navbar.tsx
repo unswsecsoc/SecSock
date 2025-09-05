@@ -2,11 +2,13 @@ import React from 'react';
 import {
   AppBar,
   Box,
+  Button,
   Slide,
   Toolbar,
   Typography,
   useScrollTrigger,
 } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 type HideOnScrollProps = {
   children: React.ReactElement;
@@ -27,16 +29,15 @@ const HideOnScrollAppBar = () => {
       <AppBar position="fixed" color="primary" elevation={4}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
           {/* Left Side: Logo */}
-          <Typography variant="h4">SecSock</Typography>
+          <Typography variant="h4" component={Link} to="/">
+            SecSock
+          </Typography>
 
           {/* Right Side: Buttons */}
           <Box sx={{ display: 'flex' }}>
-            {/* <Button color="inherit" onClick={() => alert('Docs clicked')}>
-              Docs
+            <Button color="inherit" component={Link} to="/learn">
+              Learn
             </Button>
-            <Button color="inherit" onClick={() => alert('Login clicked')}>
-              Login
-            </Button> */}
           </Box>
         </Toolbar>
       </AppBar>
