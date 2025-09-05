@@ -82,7 +82,7 @@ function Home() {
       }
 
       // Need a way to make this wss automatically for prod, wss doesn't work in dev environment
-      const ws = new WebSocket(`ws://${backendDomain}/ws/${token}`);
+      const ws = new WebSocket(`wss://${backendDomain}/ws/${token}`);
       ws.onmessage = (event) => {
         toast('Received a request', {
           position: 'top-right',

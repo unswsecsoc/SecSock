@@ -12,12 +12,10 @@ webhooks = {}  # {token: [list of requests]}
 clients = {}   # {token: [list of WebSocket connections]}
 
 origins = [
-    "http://localhost:5173",
-    "localhost:5173",
-    "http://localhost:8080",
-    "https://unswsecsoc.github.io/SecSock/",
-    "unswsecsoc.github.io",
-    "https://api.secsock.secso.cc/"
+    "http://localhost:5173",     # dev frontend
+    "http://localhost:8080",     # another dev case
+    "https://unswsecsoc.github.io",  # GH Pages
+    "https://secsock.secso.cc",      # your custom CNAME frontend
 ]
 
 app.add_middleware(
