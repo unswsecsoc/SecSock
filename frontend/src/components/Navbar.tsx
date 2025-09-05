@@ -29,11 +29,7 @@ const HideOnScrollAppBar = () => {
       <AppBar position="fixed" color="primary" elevation={4}>
         <Toolbar sx={{ justifyContent: 'space-between' }}>
           {/* Left Side: Logo */}
-          <Typography
-            variant="h4"
-            component={Link}
-            to="/"
-          >
+          <Typography variant="h4" component={Link} to="/">
             SecSock
           </Typography>
 

@@ -8,7 +8,9 @@ import Learn from './components/Learn';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const [termsAccepted, setAccepted] = useState(Cookies.get('termsaccepted') === 'true');
+  const [termsAccepted, setAccepted] = useState(
+    Cookies.get('termsaccepted') === 'true'
+  );
 
   const handleAccept = () => {
     Cookies.set('termsaccepted', 'true', { expires: 30 });
