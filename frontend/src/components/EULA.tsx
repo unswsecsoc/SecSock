@@ -1,4 +1,5 @@
 import { Typography, Button, Box } from '@mui/material';
+import { Link } from 'react-router-dom';
 
 const EULA = ({ onAccept }: { onAccept: () => void }) => {
   return (
@@ -23,6 +24,8 @@ const EULA = ({ onAccept }: { onAccept: () => void }) => {
             mb: 2,
           }}
           color="secondary"
+          component={Link}
+          to="/"
           onClick={onAccept}
         >
           I Accept
