@@ -15,12 +15,12 @@ origins = [
     "http://localhost:5173",     # dev frontend
     "http://localhost:8080",     # another dev case
     "https://unswsecsoc.github.io",  # GH Pages
-    "https://secsock.secso.cc",      # your custom CNAME frontend
+    "https://secsock.secso.cc",      # CNAME frontend
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=[origins],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
