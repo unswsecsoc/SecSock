@@ -2,7 +2,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import { Box, Link, List, ListItem, Typography } from '@mui/material';
 
-function Learn() {
+function Learn({ toggleTheme, mode }: { toggleTheme: () => void; mode: 'light' | 'dark' }) {
   return (
     <Box
       sx={{
@@ -13,7 +13,7 @@ function Learn() {
         mt: '10vh'
       }}
     >
-      <Navbar />
+      <Navbar toggleTheme={toggleTheme} mode={mode} />
 
       <Box sx={{mx: '5vw'}}>
       {/* Title */}

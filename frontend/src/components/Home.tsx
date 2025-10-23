@@ -12,7 +12,7 @@ import notificationSound from '../assets/request_received_notification.mp3';
 const backendURL = import.meta.env.VITE_BACKEND_URL;
 const backendDomain = backendURL.split('//')[1];
 
-function Home() {
+function Home({ toggleTheme, mode }: { toggleTheme: () => void; mode: 'light' | 'dark' }) {
   const [token, setToken] = useState<string | null>(null);
   const [logs, setLogs] = useState<WebhookRequest[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
@@ -151,7 +151,7 @@ function Home() {
 
   return (
     <>
-      <Navbar />
+      <Navbar toggleTheme={toggleTheme} mode={mode} />
       <Box sx={{ py: 4, width: '100vw', minHeight: '94.6vh', mt: '10vh' }}>
         {/* Generate button if no token */}
         {!token && (
