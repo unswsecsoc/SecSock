@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
 import type { WebhookRequest } from './types';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
-import { Box, Button, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Typography, useTheme } from '@mui/material';
 import RequestAccordion from './RequestAccordion';
 import PulsingDot from './PulsingDot';
 import Navbar from './Navbar';
@@ -18,6 +18,8 @@ function Home() {
   const wsRef = useRef<WebSocket | null>(null);
   const theme = useTheme();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [backendUp, setBackendUp] = useState<boolean | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   const playSound = () => {
     if (audioRef.current) {
@@ -45,20 +47,35 @@ function Home() {
   };
 
   const createNew = async () => {
-    // Needed so replaceOld works
-    if (wsRef.current) {
-      wsRef.current.close();
-      wsRef.current = null;
-    }
+  setIsCreating(true);
 
-    // Get new token
+  try {
+    // Check backend health first
+    const healthRes = await fetch(`${backendURL}/health`);
+    if (!healthRes.ok) throw new Error('Backend unhealthy');
+
     const res = await fetch(`${backendURL}/new`);
+    if (!res.ok) throw new Error('Failed to create webhook');
+
     const data = await res.json();
     setToken(data.token);
     Cookies.set('token', data.token, { expires: 7 });
 
     setupWebSocket(data.token);
-  };
+  } catch (err) {
+    console.error('Error creating new webhook:', err);
+    toast.error('Backend unavailable. Please try again later.', {
+      position: 'top-right',
+      autoClose: 4000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      theme: theme.palette.mode,
+      transition: Bounce,
+    });
+  } finally {
+    setIsCreating(false);
+  }
+};
 
   const fetchLogs = useCallback(async (token: string) => {
     try {
@@ -116,11 +133,27 @@ function Home() {
     }
   }, [fetchLogs, setupWebSocket]);
 
+  /* Check backend /health endpoint periodically */
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        const res = await fetch(`${backendURL}/health`);
+        setBackendUp(res.ok);
+      } catch {
+        setBackendUp(false);
+      }
+    };
+
+    checkHealth();
+    const interval = setInterval(checkHealth, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       <Navbar />
       <Box sx={{ py: 4, width: '100vw', minHeight: '94.6vh', mt: '10vh' }}>
-        {/* If not token has been previously generated */}
+        {/* Generate button if no token */}
         {!token && (
           <Box m={'11%'}>
             <Button
@@ -129,20 +162,17 @@ function Home() {
               size="large"
               sx={{ fontSize: '1.2rem', px: 4, py: 2 }}
               color="primary"
+              disabled={isCreating}
             >
-              Generate New Webhook
+              {isCreating ? 'Connecting...' : 'Generate New Webhook'}
             </Button>
           </Box>
         )}
 
-        {/* If a token is already stored */}
+        {/* Main Section (always visible once token exists) */}
         {token && (
-          <Box
-            display={'flex'}
-            width={'100%'}
-            alignItems={'flex-start'}
-            gap={2}
-          >
+          <Box display="flex" width="100%" alignItems="flex-start" gap={2}>
+            {/* Left side: webhook info */}
             <Box
               sx={{
                 flex: '0 0 40%',
@@ -153,7 +183,7 @@ function Home() {
             >
               <Box
                 textAlign="center"
-                bgcolor={'background.paper'}
+                bgcolor="background.paper"
                 borderRadius={2}
                 padding={2}
               >
@@ -179,7 +209,7 @@ function Home() {
               </Box>
             </Box>
 
-            {/* Accordion */}
+            {/* Right side: requests + listening indicator */}
             <Box
               sx={{
                 flex: '1 1 60%',
@@ -190,14 +220,36 @@ function Home() {
               }}
             >
               <Box display="flex" alignItems="center" gap={2} ml={1}>
-                <PulsingDot />
-                <Typography variant="h5" fontWeight={600}>
-                  Listening...
-                </Typography>
+                {backendUp === null ? (
+                  <>
+                    <CircularProgress size={20} />
+                    <Typography variant="h5" fontWeight={600}>
+                      Checking backend health...
+                    </Typography>
+                  </>
+                ) : backendUp ? (
+                  <>
+                    <PulsingDot />
+                    <Typography variant="h5" fontWeight={600}>
+                      Listening...
+                    </Typography>
+                  </>
+                ) : (
+                  <>
+                    <PulsingDot colour="red" />
+                    <Typography
+                      variant="h5"
+                      fontWeight={600}
+                      color="error.main"
+                    >
+                      Backend is waking up...
+                    </Typography>
+                  </>
+                )}
               </Box>
 
               <Box
-                bgcolor={'background.paper'}
+                bgcolor="background.paper"
                 padding={2}
                 borderRadius={2}
                 sx={{

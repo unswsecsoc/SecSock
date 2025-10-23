@@ -118,3 +118,13 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
     except WebSocketDisconnect:
         clients[token].remove(websocket)
 
+@app.get("/health")
+async def health_check():
+    return JSONResponse(
+        content={
+            "status": "ok",
+            "service": "secsock-backend",
+            "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
+        },
+        status_code=200,
+    )
